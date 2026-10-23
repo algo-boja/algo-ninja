@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>알고 닌자 — 알고보자</title>
+<meta name="description" content="떨어지는 숫자를 ←/→로. 퀵정렬·버블정렬·힙정렬… 규칙이 계속 바뀌는 알고리즘 반응속도 게임">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div><span class="score" id="score">0</span>콤보 <b id="combo">0</b> · <b id="speed">x1.0</b></div>
+    <div><span class="lives" id="lives"></span><button id="mute" class="mute" aria-label="소리 켜기/끄기">소리 켬</button></div>
+  </header>
+
+  <div class="modebar"><div class="mode" id="modeName">알고 닌자</div><div class="rule" id="rule"></div></div>
+
+  <main class="field" id="field">
+    <div class="drop" id="drop"></div>
+    <div class="intro" id="intro"><b id="introName"></b><span id="introRule"></span></div>
+    <img class="nana" id="nana" src="img/nana_perch.png" alt="">
+  </main>
+
+  <section class="view" id="view"></section>
+
+  <div class="keys">
+    <span id="padL"><i class="arw">←</i> <span id="keyL">작다</span></span>
+    <span id="padR"><span id="keyR">크다</span> <i class="arw">→</i></span>
+  </div>
+
+  <div class="overlay" id="start">
+    <img class="hero" src="img/nana_front.png" alt="">
+    <h1>알고 닌자</h1>
+    <p>떨어지는 숫자를 <b>← / →</b>로 보낸다.<br>몇 개마다 <b>정렬 규칙이 바뀐다.</b><br>점점 빨라지고, 목숨은 3개.</p>
+    <button class="go" id="go">랭킹 모드</button>
+    <div class="practice"><span>연습하기 · 랭킹 등록 안 됨</span><div class="chips" id="chips"></div></div>
+    <p class="hint">화면 왼쪽·오른쪽을 터치 · PC는 ← → 키</p>
+  </div>
+
+  <div class="overlay hidden" id="over">
+    <div class="final"><span id="finalScore">0</span>점</div>
+    <div class="best" id="best"></div>
+    <section class="rank hidden" id="rank">
+      <form class="rankForm" id="rankForm">
+        <input id="nick" maxlength="12" placeholder="닉네임 (12자)" autocomplete="off">
+        <button class="sub" id="rankBtn">랭킹 등록</button>
+      </form>
+      <div class="rankMsg" id="rankMsg"></div>
+      <div class="tabs"><button data-p="today" class="on">오늘</button><button data-p="all">전체</button></div>
+      <ol class="board" id="board"></ol>
+    </section>
+    <ul class="sums" id="sums"></ul>
+    <div class="endBtns"><button class="go" id="again">다시 하기</button><button class="menu" id="menu">처음으로</button></div>
+  </div>
+</div>
+<script type="module" src="game.js"></script>
+</body>
+</html>
