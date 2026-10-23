@@ -9,7 +9,7 @@ globalThis.fetch = async (url, opt = {}) => {
 // config 대신 값을 넣은 복사본을 불러온다
 const fs = await import('node:fs');
 const src = fs.readFileSync(new URL('./rank.js', import.meta.url), 'utf8')
-  .replace("from './config.js'", "from 'data:text/javascript,export const SUPABASE_URL=\"https://x.supabase.co\";export const SUPABASE_KEY=\"pk\";'");
+  .replace(/from '\.\/config\.js[^']*'/,"from 'data:text/javascript,export const SUPABASE_URL=\"https://x.supabase.co\";export const SUPABASE_KEY=\"pk\";'");
 const rank = await import('data:text/javascript,' + encodeURIComponent(src));
 
 assert.equal(rank.enabled, true);

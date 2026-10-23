@@ -17,6 +17,12 @@ const checks = {
   bsearch: s => { const k = s.a.indexOf(s.t); assert(k >= s.lo && k <= s.hi); },
 };
 
+// 이유 문구 끝 단어 = 정답 방향 ([←, →])
+const LABELS = {
+  quick: ['왼쪽', '오른쪽'], bubble: ['그대로', '바꿔'], select: ['패스', '새 최솟값'], insert: ['더 왼쪽', '여기 꽂기'],
+  merge: ['윗줄', '아랫줄'], heap: ['왼쪽으로', '오른쪽으로'], bsearch: ['왼쪽', '오른쪽'],
+};
+
 for (const [key, m] of Object.entries(MODES)) {
   for (let game = 0; game < 300; game++) {
     const s = m.init();
@@ -25,6 +31,9 @@ for (const [key, m] of Object.entries(MODES)) {
       if (key === 'insert') assert(sorted(s.a.slice(0, s.j)), 'insert prefix');
       const d = m.answer(s);
       assert(d === 1 || d === -1);
+      const w = m.why(s);
+      assert(!/undefined|NaN/.test(w), `${key}: ${w}`);
+      assert.equal(w.split(' → ')[1], LABELS[key][d < 0 ? 0 : 1], `${key}: ${w}`);
       m.apply(s, d);
       checks[key](s);
     }

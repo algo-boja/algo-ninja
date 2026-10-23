@@ -1,10 +1,11 @@
-import { MODES, rnd } from './modes.js';
-import * as rank from './rank.js';
+import { MODES, rnd } from './modes.js?v=3';
+import * as rank from './rank.js?v=3';
 
 const $ = id => document.getElementById(id);
 const app = $('app'), field = $('field'), drop = $('drop');
 const BASE = 0.30, STEP = 0.012, MAX = 1.05;  // 낙하 속도: 필드 높이/초
 const MODE_PAUSE = 1100;
+const WHY_PAUSE = 900;  // 틀렸을 때 이유 보여주는 시간
 
 // 효과음 (겹쳐 울리게 매번 복제)
 const SFX = { ok: ['bbok', .45], bad: ['swap', .7], combo: ['ding', .5], mode: ['whoosh', .2] };
@@ -49,8 +50,21 @@ function miss(late) {
   app.classList.remove('shake'); void app.offsetWidth; app.classList.add('shake');
   sfx('bad'); nanaMove('tilt');
   hud();
-  if (S.lives <= 0) return gameOver();
-  spawn();
+  // 이유를 보여주고 정답대로 한 칸 진행한 뒤 이어간다 (멈춘 동안은 낙하·입력 없음)
+  const ans = S.m.answer(S.ms);
+  $('why').textContent = (late ? '늦었다 · ' : '') + S.m.why(S.ms);
+  $('why').classList.add('show');
+  const hint = ans < 0 ? $('padL') : $('padR');
+  hint.classList.add('hint');
+  S.m.apply(S.ms, ans);
+  $('view').innerHTML = S.m.view(S.ms);
+  S.waiting = true;
+  setTimeout(() => {
+    $('why').classList.remove('show'); hint.classList.remove('hint');
+    S.waiting = false;
+    if (S.lives <= 0) return gameOver();
+    spawn();
+  }, WHY_PAUSE);
 }
 
 // 타일 자리에서 점수가 떠오른다. 보너스는 금색으로 크게, 한 칸 위에
@@ -65,7 +79,7 @@ function pop(text, bonus = false) {
 function bump() { const s = $('score'); s.classList.remove('bump'); void s.offsetWidth; s.classList.add('bump'); }
 
 function pick(d) {
-  if (!S || !S.run || performance.now() < S.pauseUntil) return;
+  if (!S || !S.run || S.waiting || performance.now() < S.pauseUntil) return;
   press(d);
   if (S.m.answer(S.ms) !== d) return miss(false);
   S.m.apply(S.ms, d);
@@ -84,7 +98,7 @@ function pick(d) {
 function loop(now) {
   if (!S.run) return;
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
-  if (now >= S.pauseUntil) {
+  if (now >= S.pauseUntil && !S.waiting) {
     $('intro').classList.remove('show');
     const h = field.clientHeight;
     S.y += S.speed * h * dt;

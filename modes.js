@@ -1,6 +1,6 @@
 // 미니게임 7종. 화면과 상관없는 순수 로직이라 node로 점검할 수 있다 (test_modes.mjs).
 // 모드마다: init() → 상태, next(s) → 떨어지는 타일 글자, answer(s) → 정답 방향(-1 ← / 1 →),
-//          apply(s, d) → 정답을 반영, view(s) → 아래 줄 HTML
+//          why(s) → 틀렸을 때 이유 한 줄, apply(s, d) → 정답을 반영, view(s) → 아래 줄 HTML
 export const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
 const uniq = (n, a, b) => { const s = new Set(); while (s.size < n) s.add(rnd(a, b)); return [...s]; };
 const up = (x, y) => x - y;
@@ -17,6 +17,7 @@ export const MODES = {
     init: () => ({ p: rnd(30, 70), L: [], R: [] }),
     next(s) { do s.n = rnd(1, 99); while (s.n === s.p); return s.n; },
     answer: s => (s.n < s.p ? -1 : 1),
+    why: s => (s.n < s.p ? `${s.n} < 피벗 ${s.p} → 왼쪽` : `${s.n} > 피벗 ${s.p} → 오른쪽`),
     apply(s, d) { (d < 0 ? s.L : s.R).push(s.n); },
     view: s => `<div class="row split"><div class="row pile l">${s.L.slice(-3).map(v => cell(v, 'L')).join('')}</div>`
       + cell(s.p, 'key big') + `<div class="row pile r">${s.R.slice(-3).map(v => cell(v, 'R')).join('')}</div></div>`,
@@ -31,6 +32,7 @@ export const MODES = {
       return pair(s.a[s.i], s.a[s.i + 1]);
     },
     answer: s => (s.a[s.i] > s.a[s.i + 1] ? 1 : -1),
+    why: ({ a, i }) => (a[i] > a[i + 1] ? `${a[i]} > ${a[i + 1]} → 바꿔` : `${a[i]} < ${a[i + 1]} → 그대로`),
     apply(s, d) { if (d > 0) swap(s.a, s.i, s.i + 1); s.i++; },
     view: s => `<div class="row">${s.a.map((v, k) => cell(v,
       k >= s.a.length - s.done ? 'ok' : (k === s.i || k === s.i + 1) ? 'hi' : '')).join('')}</div>`,
@@ -49,6 +51,7 @@ export const MODES = {
       return s.a[s.j];
     },
     answer: s => (s.a[s.j] < s.a[s.mi] ? 1 : -1),
+    why: ({ a, j, mi }) => (a[j] < a[mi] ? `${a[j]} < 최솟값 ${a[mi]} → 새 최솟값` : `${a[j]} > 최솟값 ${a[mi]} → 패스`),
     apply(s, d) { if (d > 0) s.mi = s.j; s.j++; },
     view: s => `<div class="row">${s.a.map((v, k) => cell(v,
       k < s.i ? 'ok' : k === s.mi ? 'key' : k === s.j ? 'hi' : '')).join('')}</div>`
@@ -64,6 +67,7 @@ export const MODES = {
       return s.key;
     },
     answer: s => (s.key < s.a[s.p - 1] ? -1 : 1),
+    why: ({ key, a, p }) => (key < a[p - 1] ? `${key} < ${a[p - 1]} → 더 왼쪽` : `${key} > ${a[p - 1]} → 여기 꽂기`),
     apply(s, d) {
       if (d < 0) s.p--;
       if (d > 0 || s.p === 0) { s.a.splice(s.j, 1); s.a.splice(s.p, 0, s.key); s.j++; s.need = true; }
@@ -84,6 +88,7 @@ export const MODES = {
     fresh(s) { const v = uniq(8, 1, 99); s.A = v.slice(0, 4).sort(up); s.B = v.slice(4).sort(up); s.out = []; },
     next(s) { if (!s.A.length || !s.B.length) this.fresh(s); return pair(s.A[0], s.B[0]); },
     answer: s => (s.A[0] < s.B[0] ? -1 : 1),
+    why: ({ A, B }) => (A[0] < B[0] ? `윗줄 ${A[0]} < 아랫줄 ${B[0]} → 윗줄` : `아랫줄 ${B[0]} < 윗줄 ${A[0]} → 아랫줄`),
     apply(s, d) { s.out.push((d < 0 ? s.A : s.B).shift()); },
     view(s) {
       const r = (lab, a, c) => `<div class="row"><span class="lab">${lab}</span>${a.map((v, k) => cell(v, k === 0 ? c : '')).join('')}</div>`;
@@ -126,6 +131,11 @@ export const MODES = {
       return tag('내려가는 수', s.a[s.cur]);
     },
     answer: s => (s.c === 2 * s.cur + 1 ? -1 : 1),
+    why({ a, cur, n }) {
+      const l = a[2 * cur + 1], r = 2 * cur + 2 < n ? a[2 * cur + 2] : undefined;
+      if (r === undefined) return `자식은 왼쪽 ${l} 하나 → 왼쪽으로`;
+      return l > r ? `왼쪽 ${l} > 오른쪽 ${r} → 왼쪽으로` : `왼쪽 ${l} < 오른쪽 ${r} → 오른쪽으로`;
+    },
     apply(s) { s.fresh = false; swap(s.a, s.cur, s.c); s.cur = s.c; },
     view(s) {
       // 노드 자리 (트리 상자 260x128 안의 중심 좌표)
@@ -155,6 +165,7 @@ export const MODES = {
     found(s) { return s.a[this.mid(s)] === s.t; },
     next(s) { if (this.found(s)) this.fresh(s); return s.t; },
     answer(s) { return s.t < s.a[this.mid(s)] ? -1 : 1; },
+    why(s) { const m = s.a[this.mid(s)]; return s.t < m ? `찾는 수 ${s.t} < 가운데 ${m} → 왼쪽` : `찾는 수 ${s.t} > 가운데 ${m} → 오른쪽`; },
     apply(s, d) { const m = this.mid(s); if (d < 0) s.hi = m - 1; else s.lo = m + 1; },
     view(s) {
       const m = this.mid(s), f = this.found(s);

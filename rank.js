@@ -1,5 +1,5 @@
 // 랭킹: Supabase REST를 fetch로 바로 부른다 (라이브러리 없음). 공개 키는 apikey 헤더로만 보낸다.
-import { SUPABASE_URL, SUPABASE_KEY } from './config.js';
+import { SUPABASE_URL, SUPABASE_KEY } from './config.js?v=3';
 
 export const enabled = Boolean(SUPABASE_URL && SUPABASE_KEY);
 
