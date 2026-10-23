@@ -1,5 +1,5 @@
-import { MODES, rnd } from './modes.js?v=3';
-import * as rank from './rank.js?v=3';
+import { MODES, rnd } from './modes.js?v=4';
+import * as rank from './rank.js?v=4';
 
 const $ = id => document.getElementById(id);
 const app = $('app'), field = $('field'), drop = $('drop');
@@ -8,7 +8,7 @@ const MODE_PAUSE = 1100;
 const WHY_PAUSE = 900;  // 틀렸을 때 이유 보여주는 시간
 
 // 효과음 (겹쳐 울리게 매번 복제)
-const SFX = { ok: ['bbok', .45], bad: ['swap', .7], combo: ['ding', .5], mode: ['whoosh', .2] };
+const SFX = { ok: ['bbok', .45], bad: ['swap', .7], combo: ['ding', .5], mode: ['levelup', .7] };
 const audio = Object.fromEntries(Object.entries(SFX).map(([k, [f, v]]) => { const a = new Audio(`sfx/${f}.mp3`); a.volume = v; return [k, a]; }));
 let muted = load('mute') === '1';
 function sfx(k) { if (muted) return; const a = audio[k].cloneNode(); a.volume = audio[k].volume; a.play().catch(() => {}); }
