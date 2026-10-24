@@ -119,6 +119,18 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .keys .press { opacity: .35; }
 #app { cursor: pointer; touch-action: manipulation; }
 
+/* 그림 보는 모드(선택·삽입·병합·힙·이진 탐색): 타일 작게, 아래 그림 크게 */
+.vf .drop { min-width: 56px; height: 46px; padding: 0 12px; font-size: 20px; border-radius: 10px; }
+.vf .drop .sep { height: 20px; }
+.vf .view { gap: 9px; padding: 18px 0; }
+.vf .row { gap: 5px; }
+.vf .c { min-width: 44px; height: 46px; font-size: 19px; border-radius: 9px; }
+.vf .row.tight { gap: 3px; }
+.vf .row.tight .c { min-width: 28px; height: 44px; font-size: 15px; }
+.vf .lab { font-size: 13px; }
+.vf .note { font-size: 13px; }
+.vf .heap { transform: scale(1.25); margin: 18px 0 20px; }
+
 #app.shake { animation: shake .25s; }
 @keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
 

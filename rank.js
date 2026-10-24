@@ -1,5 +1,5 @@
 // 랭킹: Supabase REST를 fetch로 바로 부른다 (라이브러리 없음). 공개 키는 apikey 헤더로만 보낸다.
-import { SUPABASE_URL, SUPABASE_KEY } from './config.js?v=4';
+import { SUPABASE_URL, SUPABASE_KEY } from './config.js?v=7';
 
 export const enabled = Boolean(SUPABASE_URL && SUPABASE_KEY);
 
@@ -22,13 +22,13 @@ export async function submit(name, score, playedMs) {
     method: 'POST', headers: { ...headers, Prefer: 'return=minimal' },
     body: JSON.stringify({ name, score, played_ms: Math.round(playedMs) }),
   });
-  if (!r.ok) throw new Error(`등록 실패 (${r.status})`);
+  if (!r.ok) throw new Error(`등록에 실패했습니다 (${r.status})`);
 }
 
 export async function top(period, limit = 10) {
   const since = period === 'today' ? `&created_at=gte.${todayStartIso()}` : '';
   const r = await fetch(`${api}?select=name,score&order=score.desc,created_at.asc&limit=${limit}${since}`, { headers });
-  if (!r.ok) throw new Error(`불러오기 실패 (${r.status})`);
+  if (!r.ok) throw new Error(`불러오지 못했습니다 (${r.status})`);
   return r.json();
 }
 
@@ -36,6 +36,6 @@ export async function top(period, limit = 10) {
 export async function rankOf(score, period) {
   const since = period === 'today' ? `&created_at=gte.${todayStartIso()}` : '';
   const r = await fetch(`${api}?select=id&score=gt.${score}${since}`, { method: 'HEAD', headers: { ...headers, Prefer: 'count=exact' } });
-  if (!r.ok) throw new Error(`순위 실패 (${r.status})`);
+  if (!r.ok) throw new Error(`순위를 확인하지 못했습니다 (${r.status})`);
   return Number((r.headers.get('content-range') || '*/0').split('/')[1]) + 1;
 }

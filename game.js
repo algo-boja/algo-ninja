@@ -1,5 +1,5 @@
-import { MODES, rnd } from './modes.js?v=4';
-import * as rank from './rank.js?v=4';
+import { MODES, rnd } from './modes.js?v=7';
+import * as rank from './rank.js?v=7';
 
 const $ = id => document.getElementById(id);
 const app = $('app'), field = $('field'), drop = $('drop');
@@ -31,6 +31,7 @@ function setMode() {
   S.key = keys[rnd(0, keys.length - 1)];
   S.m = MODES[S.key]; S.ms = S.m.init(); S.left = rnd(6, 9); S.seen.add(S.key);
   app.style.setProperty('--acc', S.m.color[1]);
+  app.classList.toggle('vf', !['quick', 'bubble'].includes(S.key));  // 아래 그림을 보고 푸는 모드: 타일 작게, 그림 크게
   $('modeName').textContent = S.m.name; $('rule').textContent = S.m.rule;
   $('keyL').textContent = S.m.keys[0]; $('keyR').textContent = S.m.keys[1];
   $('introName').textContent = S.m.name; $('introRule').textContent = S.m.rule;
@@ -134,7 +135,7 @@ function showRank() {
   $('rank').classList.toggle('hidden', !rank.enabled);
   if (!rank.enabled) return;
   $('nick').value = load('nick') || '';
-  const blocked = S.fixed ? '연습 모드는 랭킹 등록 안 돼. 랭킹 모드로 도전해봐' : S.score === 0 ? '0점은 등록 안 돼' : '';
+  const blocked = S.fixed ? '연습 모드는 랭킹에 등록되지 않습니다. 랭킹 모드로 도전하세요!' : S.score === 0 ? '0점은 등록할 수 없습니다' : '';
   $('rankForm').classList.toggle('hidden', Boolean(blocked));
   rankMsg(blocked);
   loadBoard();
@@ -152,16 +153,16 @@ async function loadBoard(me) {
       li.children[2].textContent = r.score;
       return li;
     }));
-    if (!rows.length) board.innerHTML = '<li class="empty">아직 기록이 없어. 첫 번째가 돼봐</li>';
-  } catch (e) { board.innerHTML = '<li class="empty">랭킹을 못 불러왔어</li>'; }
+    if (!rows.length) board.innerHTML = '<li class="empty">아직 기록이 없습니다. 첫 번째 주인공이 되어 보세요!</li>';
+  } catch (e) { board.innerHTML = '<li class="empty">랭킹을 불러오지 못했습니다</li>'; }
 }
 $('rankForm').addEventListener('submit', async e => {
   e.preventDefault();
   if (S.sent) return;
   const name = $('nick').value.trim();
-  if (!name) return rankMsg('닉네임을 적어줘', true);
-  if (name.length > 12) return rankMsg('닉네임은 12자까지', true);
-  if (!rank.isClean(name)) return rankMsg('쓸 수 없는 닉네임이야. 다른 걸로 해줘', true);
+  if (!name) return rankMsg('닉네임을 입력하세요', true);
+  if (name.length > 12) return rankMsg('닉네임은 12자까지 가능합니다', true);
+  if (!rank.isClean(name)) return rankMsg('사용할 수 없는 닉네임입니다', true);
   S.sent = true; $('rankBtn').disabled = true; rankMsg('등록 중…');
   try {
     await rank.submit(name, S.score, S.playedMs);
@@ -171,7 +172,7 @@ $('rankForm').addEventListener('submit', async e => {
     rankMsg(`오늘 ${today}위 · 전체 ${all}위`);
     loadBoard({ name, score: S.score });
   } catch (err) {
-    S.sent = false; rankMsg(err.message + ' — 다시 눌러봐', true);
+    S.sent = false; rankMsg(err.message + '. 다시 시도하세요', true);
   } finally { $('rankBtn').disabled = false; }
 });
 $('nick').addEventListener('input', () => rankMsg(''));

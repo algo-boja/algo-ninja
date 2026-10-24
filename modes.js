@@ -13,7 +13,7 @@ export const MODES = {
   quick: {
     name: '퀵정렬', color: ['#c4b5fd', '#7c3aed'],
     rule: '피벗보다 작으면 ←, 크면 →', keys: ['작다', '크다'],
-    sum: '기준(피벗) 하나로 작은 쪽·큰 쪽을 가른다',
+    sum: '기준(피벗) 하나로 작은 쪽·큰 쪽을 가릅니다',
     init: () => ({ p: rnd(30, 70), L: [], R: [] }),
     next(s) { do s.n = rnd(1, 99); while (s.n === s.p); return s.n; },
     answer: s => (s.n < s.p ? -1 : 1),
@@ -24,15 +24,15 @@ export const MODES = {
   },
   bubble: {
     name: '버블정렬', color: ['#fcc440', '#f97316'],
-    rule: '앞이 더 크면 → 바꿔, 아니면 ← 그대로', keys: ['그대로', '바꿔'],
-    sum: '옆끼리 바꾸다 보면 큰 수가 뒤로 떠오른다',
+    rule: '앞이 더 크면 → 바꾸기, 아니면 ← 그대로', keys: ['그대로', '바꾸기'],
+    sum: '옆끼리 바꾸다 보면 큰 수가 뒤로 떠오릅니다',
     init: () => ({ a: uniq(6, 1, 99), i: 0, done: 0 }),
     next(s) {
       if (s.i >= s.a.length - 1 - s.done) { s.done++; s.i = 0; if (s.done >= 3) { s.a = uniq(6, 1, 99); s.done = 0; } }
       return pair(s.a[s.i], s.a[s.i + 1]);
     },
     answer: s => (s.a[s.i] > s.a[s.i + 1] ? 1 : -1),
-    why: ({ a, i }) => (a[i] > a[i + 1] ? `${a[i]} > ${a[i + 1]} → 바꿔` : `${a[i]} < ${a[i + 1]} → 그대로`),
+    why: ({ a, i }) => (a[i] > a[i + 1] ? `${a[i]} > ${a[i + 1]} → 바꾸기` : `${a[i]} < ${a[i + 1]} → 그대로`),
     apply(s, d) { if (d > 0) swap(s.a, s.i, s.i + 1); s.i++; },
     view: s => `<div class="row">${s.a.map((v, k) => cell(v,
       k >= s.a.length - s.done ? 'ok' : (k === s.i || k === s.i + 1) ? 'hi' : '')).join('')}</div>`,
@@ -40,7 +40,7 @@ export const MODES = {
   select: {
     name: '선택정렬', color: ['#67e8f9', '#0891b2'],
     rule: '최솟값보다 작으면 → 새 최솟값, 아니면 ← 패스', keys: ['패스', '새 최솟값'],
-    sum: '한 바퀴 돌며 최솟값을 찾아 맨 앞으로 보낸다',
+    sum: '한 바퀴 돌며 최솟값을 찾아 맨 앞으로 보냅니다',
     init: () => ({ a: uniq(6, 1, 99), i: 0, mi: 0, j: 1 }),
     next(s) {
       if (s.j >= s.a.length) {
@@ -60,7 +60,7 @@ export const MODES = {
   insert: {
     name: '삽입정렬', color: ['#93c5fd', '#3b5bdb'],
     rule: '노란 칸보다 작으면 ← 더 왼쪽, 아니면 → 여기 꽂기', keys: ['더 왼쪽', '여기 꽂기'],
-    sum: '이미 정렬된 줄에 한 장씩 끼워 넣는다',
+    sum: '이미 정렬된 줄에 한 장씩 끼워 넣습니다',
     init: () => ({ a: uniq(6, 1, 99), j: 1, need: true }),
     next(s) {
       if (s.need) { if (s.j >= s.a.length) { s.a = uniq(6, 1, 99); s.j = 1; } s.key = s.a[s.j]; s.p = s.j; s.need = false; }
@@ -83,7 +83,7 @@ export const MODES = {
   merge: {
     name: '병합정렬', color: ['#f9a8d4', '#db2777'],
     rule: '두 줄 맨 앞 중 더 작은 쪽: 윗줄 ←, 아랫줄 →', keys: ['윗줄', '아랫줄'],
-    sum: '정렬된 두 줄은 맨 앞끼리만 비교해도 합쳐진다',
+    sum: '정렬된 두 줄은 맨 앞끼리만 비교해도 합쳐집니다',
     init() { const s = {}; this.fresh(s); return s; },
     fresh(s) { const v = uniq(8, 1, 99); s.A = v.slice(0, 4).sort(up); s.B = v.slice(4).sort(up); s.out = []; },
     next(s) { if (!s.A.length || !s.B.length) this.fresh(s); return pair(s.A[0], s.B[0]); },
@@ -99,7 +99,7 @@ export const MODES = {
   heap: {
     name: '힙정렬', color: ['#fda4af', '#e11d48'],
     rule: '테두리 수를 더 큰 자식 쪽으로: 왼쪽 ←, 오른쪽 →', keys: ['왼쪽 자식', '오른쪽 자식'],
-    sum: '맨 위(최댓값)를 빼고, 새 맨 위를 더 큰 자식 쪽으로 가라앉힌다',
+    sum: '맨 위(최댓값)를 빼고, 새 맨 위를 더 큰 자식 쪽으로 가라앉힙니다',
     init() { return { a: this.heapify(uniq(7, 1, 99)), n: 7, cur: -1 }; },
     heapify(a) {  // 아래에서부터 내려보내기 → 랜덤한 최대 힙
       for (let i = (a.length >> 1) - 1; i >= 0; i--) {
@@ -154,7 +154,7 @@ export const MODES = {
   bsearch: {
     name: '이진 탐색', color: ['#5eead4', '#0d9488'],
     rule: '노란 칸보다 작으면 ←, 크면 →', keys: ['작다', '크다'],
-    sum: '정렬된 줄에서 반씩 버리면 금방 찾는다',
+    sum: '정렬된 줄에서 반씩 버리면 금방 찾습니다',
     init() { const s = {}; this.fresh(s); return s; },
     fresh(s) {
       s.a = uniq(11, 1, 99).sort(up);
